@@ -1,0 +1,57 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "CrueVeille",
+        "description": "Surveille une station Vigicrues proche d'une position ou une station precise.",
+        "data": {
+          "name": "Nom",
+          "station_code": "Code station Vigicrues",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "radius_km": "Rayon de recherche (km)",
+          "warning_height_m": "Seuil hauteur vigilance (m)",
+          "critical_height_m": "Seuil hauteur critique (m)",
+          "warning_rise_cm_h": "Hausse vigilance (cm/h)",
+          "critical_rise_cm_h": "Hausse critique (cm/h)",
+          "forecast_hours": "Projection (heures)",
+          "alert_level": "Niveau qui declenche l'alerte"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Impossible de contacter l'API Hub'Eau.",
+      "missing_location": "Renseignez une position ou un code station."
+    },
+    "abort": {
+      "already_configured": "Cette surveillance Vigicrues est deja configuree."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "water_level": {
+        "name": "Hauteur d'eau"
+      },
+      "flow": {
+        "name": "Debit"
+      },
+      "rise_rate": {
+        "name": "Vitesse de montee"
+      },
+      "forecast_height": {
+        "name": "Hauteur projetee"
+      },
+      "risk_level": {
+        "name": "Risque local"
+      },
+      "station_distance": {
+        "name": "Distance station"
+      }
+    },
+    "binary_sensor": {
+      "flood_alert": {
+        "name": "Alerte inondation"
+      }
+    }
+  }
+}
