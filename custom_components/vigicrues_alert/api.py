@@ -59,7 +59,7 @@ class VigicruesApiClient:
         self._session = session
 
     async def _get_json(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
-        url = URL(HUBEAU_BASE_URL) / path
+        url = URL(f"{HUBEAU_BASE_URL}/{path}")
         try:
             async with self._session.get(url, params=params, timeout=20) as response:
                 if response.status >= 400:

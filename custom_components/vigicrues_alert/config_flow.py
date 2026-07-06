@@ -9,7 +9,6 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
 from homeassistant.core import callback
-from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import VigicruesApiClient, VigicruesApiError
@@ -43,7 +42,7 @@ class VigicruesAlertConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ):
         """Handle the initial step."""
         errors: dict[str, str] = {}
 
@@ -70,7 +69,7 @@ class VigicruesAlertConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(
         config_entry: config_entries.ConfigEntry,
-    ) -> config_entries.OptionsFlow:
+    ):
         """Return the options flow."""
         return VigicruesAlertOptionsFlow(config_entry)
 
@@ -110,7 +109,7 @@ class VigicruesAlertOptionsFlow(config_entries.OptionsFlow):
     async def async_step_init(
         self,
         user_input: dict[str, Any] | None = None,
-    ) -> FlowResult:
+    ):
         """Manage options by replacing the config entry data."""
         if user_input is not None:
             data = dict(self._config_entry.data)
@@ -137,6 +136,13 @@ def _schema(
     include_name: bool = True,
 ) -> vol.Schema:
     fields: dict[Any, Any] = {}
+    latitude = defaults.get(CONF_LATITUDE, default_latitude)
+    longitude = defaults.get(CONF_LONGITUDE, default_longitude)
+    if latitude is None:
+        latitude = 46.6
+    if longitude is None:
+        longitude = 2.4
+
     if include_name:
         fields[vol.Optional(CONF_NAME, default=defaults.get(CONF_NAME, ""))] = str
 
@@ -148,11 +154,11 @@ def _schema(
             ): str,
             vol.Optional(
                 CONF_LATITUDE,
-                default=defaults.get(CONF_LATITUDE, default_latitude),
+                default=latitude,
             ): vol.Coerce(float),
             vol.Optional(
                 CONF_LONGITUDE,
-                default=defaults.get(CONF_LONGITUDE, default_longitude),
+                default=longitude,
             ): vol.Coerce(float),
             vol.Optional(
                 CONF_RADIUS_KM,
