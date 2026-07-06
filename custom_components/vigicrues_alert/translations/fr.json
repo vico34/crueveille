@@ -21,6 +21,7 @@
     },
     "error": {
       "cannot_connect": "Impossible de contacter l'API Hub'Eau.",
+      "invalid_number": "Un champ numerique contient une valeur invalide.",
       "missing_location": "Renseignez une position ou un code station."
     },
     "abort": {

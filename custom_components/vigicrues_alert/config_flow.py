@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Dict, Optional
 
 import voluptuous as vol
 
@@ -27,6 +27,7 @@ from .const import (
     DEFAULT_RADIUS_KM,
     DEFAULT_WARNING_RISE_CM_H,
     DOMAIN,
+    RISK_ORDER,
     RISK_CRITICAL,
     RISK_WARNING,
 )
@@ -39,14 +40,14 @@ class VigicruesAlertConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(
         self,
-        user_input: dict[str, Any] | None = None,
+        user_input: Optional[Dict[str, Any]] = None,
     ):
         """Handle the initial step."""
-        errors: dict[str, str] = {}
+        errors: Dict[str, str] = {}
 
         if user_input is not None:
-            user_input = _clean_input(user_input)
             try:
+                user_input = _clean_input(user_input)
                 title = await self._validate_and_title(user_input)
             except ValueError as err:
                 errors["base"] = str(err)
@@ -71,7 +72,7 @@ class VigicruesAlertConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Return the options flow."""
         return VigicruesAlertOptionsFlow(config_entry)
 
-    def _schema(self, user_input: dict[str, Any] | None = None) -> vol.Schema:
+    def _schema(self, user_input: Optional[Dict[str, Any]] = None) -> vol.Schema:
         defaults = user_input or {}
         return _schema(
             defaults,
@@ -79,7 +80,7 @@ class VigicruesAlertConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             default_longitude=self.hass.config.longitude,
         )
 
-    async def _validate_and_title(self, user_input: dict[str, Any]) -> str:
+    async def _validate_and_title(self, user_input: Dict[str, Any]) -> str:
         from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
         from .api import VigicruesApiClient
@@ -110,7 +111,7 @@ class VigicruesAlertOptionsFlow(config_entries.OptionsFlow):
 
     async def async_step_init(
         self,
-        user_input: dict[str, Any] | None = None,
+        user_input: Optional[Dict[str, Any]] = None,
     ):
         """Manage options by replacing the config entry data."""
         if user_input is not None:
@@ -131,13 +132,13 @@ class VigicruesAlertOptionsFlow(config_entries.OptionsFlow):
 
 
 def _schema(
-    defaults: dict[str, Any],
+    defaults: Dict[str, Any],
     *,
     default_latitude: float,
     default_longitude: float,
     include_name: bool = True,
 ) -> vol.Schema:
-    fields: dict[Any, Any] = {}
+    fields: Dict[Any, Any] = {}
     latitude = defaults.get(CONF_LATITUDE, default_latitude)
     longitude = defaults.get(CONF_LONGITUDE, default_longitude)
     if latitude is None:
@@ -164,34 +165,32 @@ def _schema(
             ): vol.Coerce(float),
             vol.Optional(
                 CONF_RADIUS_KM,
-                default=defaults.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM),
-            ): vol.All(vol.Coerce(float), vol.Range(min=1, max=100)),
+                default=str(defaults.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM)),
+            ): str,
             vol.Optional(
                 CONF_WARNING_HEIGHT_M,
                 default=defaults.get(CONF_WARNING_HEIGHT_M, ""),
-            ): vol.Any("", vol.Coerce(float)),
+            ): str,
             vol.Optional(
                 CONF_CRITICAL_HEIGHT_M,
                 default=defaults.get(CONF_CRITICAL_HEIGHT_M, ""),
-            ): vol.Any("", vol.Coerce(float)),
+            ): str,
             vol.Optional(
                 CONF_WARNING_RISE_CM_H,
-                default=defaults.get(
-                    CONF_WARNING_RISE_CM_H,
-                    DEFAULT_WARNING_RISE_CM_H,
+                default=str(
+                    defaults.get(CONF_WARNING_RISE_CM_H, DEFAULT_WARNING_RISE_CM_H)
                 ),
-            ): vol.All(vol.Coerce(float), vol.Range(min=0)),
+            ): str,
             vol.Optional(
                 CONF_CRITICAL_RISE_CM_H,
-                default=defaults.get(
-                    CONF_CRITICAL_RISE_CM_H,
-                    DEFAULT_CRITICAL_RISE_CM_H,
+                default=str(
+                    defaults.get(CONF_CRITICAL_RISE_CM_H, DEFAULT_CRITICAL_RISE_CM_H)
                 ),
-            ): vol.All(vol.Coerce(float), vol.Range(min=0)),
+            ): str,
             vol.Optional(
                 CONF_FORECAST_HOURS,
-                default=defaults.get(CONF_FORECAST_HOURS, DEFAULT_FORECAST_HOURS),
-            ): vol.All(vol.Coerce(int), vol.Range(min=1, max=24)),
+                default=str(defaults.get(CONF_FORECAST_HOURS, DEFAULT_FORECAST_HOURS)),
+            ): str,
             vol.Optional(
                 CONF_ALERT_LEVEL,
                 default=defaults.get(CONF_ALERT_LEVEL, DEFAULT_ALERT_LEVEL),
@@ -201,7 +200,7 @@ def _schema(
     return vol.Schema(fields)
 
 
-def _clean_input(user_input: dict[str, Any]) -> dict[str, Any]:
+def _clean_input(user_input: Dict[str, Any]) -> Dict[str, Any]:
     cleaned = dict(user_input)
     for key in (CONF_STATION_CODE, CONF_NAME):
         if key in cleaned:
@@ -211,10 +210,75 @@ def _clean_input(user_input: dict[str, Any]) -> dict[str, Any]:
     for key in (CONF_WARNING_HEIGHT_M, CONF_CRITICAL_HEIGHT_M):
         if key in cleaned and cleaned[key] == "":
             cleaned.pop(key)
+        elif key in cleaned:
+            cleaned[key] = _float_value(cleaned[key], key, minimum=0)
+
+    cleaned[CONF_LATITUDE] = _float_value(cleaned[CONF_LATITUDE], CONF_LATITUDE)
+    cleaned[CONF_LONGITUDE] = _float_value(cleaned[CONF_LONGITUDE], CONF_LONGITUDE)
+    cleaned[CONF_RADIUS_KM] = _float_value(
+        cleaned.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM),
+        CONF_RADIUS_KM,
+        minimum=1,
+        maximum=100,
+    )
+    cleaned[CONF_WARNING_RISE_CM_H] = _float_value(
+        cleaned.get(CONF_WARNING_RISE_CM_H, DEFAULT_WARNING_RISE_CM_H),
+        CONF_WARNING_RISE_CM_H,
+        minimum=0,
+    )
+    cleaned[CONF_CRITICAL_RISE_CM_H] = _float_value(
+        cleaned.get(CONF_CRITICAL_RISE_CM_H, DEFAULT_CRITICAL_RISE_CM_H),
+        CONF_CRITICAL_RISE_CM_H,
+        minimum=0,
+    )
+    cleaned[CONF_FORECAST_HOURS] = _int_value(
+        cleaned.get(CONF_FORECAST_HOURS, DEFAULT_FORECAST_HOURS),
+        CONF_FORECAST_HOURS,
+        minimum=1,
+        maximum=24,
+    )
+    if cleaned.get(CONF_ALERT_LEVEL) not in RISK_ORDER:
+        cleaned[CONF_ALERT_LEVEL] = DEFAULT_ALERT_LEVEL
     return cleaned
 
 
-def _unique_id(user_input: dict[str, Any]) -> str:
+def _float_value(
+    value: Any,
+    key: str,
+    *,
+    minimum: Optional[float] = None,
+    maximum: Optional[float] = None,
+) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError) as err:
+        raise ValueError("invalid_number") from err
+    if minimum is not None and number < minimum:
+        raise ValueError("invalid_number")
+    if maximum is not None and number > maximum:
+        raise ValueError("invalid_number")
+    return number
+
+
+def _int_value(
+    value: Any,
+    key: str,
+    *,
+    minimum: Optional[int] = None,
+    maximum: Optional[int] = None,
+) -> int:
+    try:
+        number = int(value)
+    except (TypeError, ValueError) as err:
+        raise ValueError("invalid_number") from err
+    if minimum is not None and number < minimum:
+        raise ValueError("invalid_number")
+    if maximum is not None and number > maximum:
+        raise ValueError("invalid_number")
+    return number
+
+
+def _unique_id(user_input: Dict[str, Any]) -> str:
     if user_input.get(CONF_STATION_CODE):
         return f"station:{user_input[CONF_STATION_CODE]}"
     latitude = round(float(user_input[CONF_LATITUDE]), 4)
