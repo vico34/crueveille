@@ -157,12 +157,12 @@ def _schema(
             ): str,
             vol.Optional(
                 CONF_LATITUDE,
-                default=latitude,
-            ): vol.Coerce(float),
+                default=str(latitude),
+            ): str,
             vol.Optional(
                 CONF_LONGITUDE,
-                default=longitude,
-            ): vol.Coerce(float),
+                default=str(longitude),
+            ): str,
             vol.Optional(
                 CONF_RADIUS_KM,
                 default=str(defaults.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM)),
