@@ -1,5 +1,7 @@
 # CrueVeille pour Home Assistant
 
+![CrueVeille](custom_components/vigicrues_alert/brand/icon.png)
+
 Integration personnalisee Home Assistant qui surveille une station hydrometrique Vigicrues/Hub'Eau proche d'une position et genere une alerte locale de risque d'inondation.
 
 Elle utilise l'API Hydrometrie Hub'Eau, dont les mesures temps reel proviennent de la plateforme HYDRO Centrale operee par le Service Central Vigicrues. Les hauteurs sont publiees en millimetres et les debits en litres par seconde par l'API; l'integration les convertit en metres et m3/s.
@@ -23,6 +25,23 @@ Elle utilise l'API Hydrometrie Hub'Eau, dont les mesures temps reel proviennent 
 2. Redemarrer Home Assistant.
 3. Aller dans `Parametres > Appareils et services > Ajouter une integration`.
 4. Chercher `Vigicrues Alert`.
+
+## Installation avec HACS
+
+Le depot est compatible avec une installation HACS comme depot personnalise:
+
+1. Ouvrir HACS dans Home Assistant.
+2. Aller dans `Integrations`.
+3. Ouvrir le menu puis `Depots personnalises`.
+4. Ajouter `https://github.com/vico34/crueveille`.
+5. Choisir la categorie `Integration`.
+6. Installer `CrueVeille`, puis redemarrer Home Assistant.
+
+Lien direct:
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=vico34&repository=crueveille&category=integration)
+
+Pour une inclusion dans les depots HACS par defaut, le depot doit rester public, avoir une description, des topics, les GitHub Actions HACS/Hassfest au vert, puis une release GitHub complete avant la demande d'ajout dans `hacs/default`.
 
 ## Configuration
 

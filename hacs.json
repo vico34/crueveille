@@ -1,8 +1,6 @@
 {
   "name": "CrueVeille",
   "content_in_root": false,
-  "render_readme": true,
-  "domains": ["binary_sensor", "sensor"],
-  "country": ["FR"],
+  "country": "FR",
   "homeassistant": "2024.6.0"
 }
