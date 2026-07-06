@@ -9,9 +9,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
 from homeassistant.core import callback
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
-from .api import VigicruesApiClient, VigicruesApiError
 from .const import (
     CONF_ALERT_LEVEL,
     CONF_CRITICAL_HEIGHT_M,
@@ -50,10 +48,10 @@ class VigicruesAlertConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             user_input = _clean_input(user_input)
             try:
                 title = await self._validate_and_title(user_input)
-            except VigicruesApiError:
-                errors["base"] = "cannot_connect"
             except ValueError as err:
                 errors["base"] = str(err)
+            except Exception:  # noqa: BLE001
+                errors["base"] = "cannot_connect"
             else:
                 await self.async_set_unique_id(_unique_id(user_input))
                 self._abort_if_unique_id_configured()
@@ -82,6 +80,10 @@ class VigicruesAlertConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
 
     async def _validate_and_title(self, user_input: dict[str, Any]) -> str:
+        from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+        from .api import VigicruesApiClient
+
         client = VigicruesApiClient(async_get_clientsession(self.hass))
         station_code = user_input.get(CONF_STATION_CODE)
         if station_code:
