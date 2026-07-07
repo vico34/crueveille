@@ -45,6 +45,12 @@ Lien direct:
 
 Pour une inclusion dans les depots HACS par defaut, le depot doit rester public, avoir une description, des topics, les GitHub Actions HACS/Hassfest au vert, puis une release GitHub complete avant la demande d'ajout dans `hacs/default`.
 
+## Soutenir le projet
+
+Si CrueVeille vous est utile, vous pouvez soutenir le developpement:
+
+[Buy Me a Coffee](https://buymeacoffee.com/vicar)
+
 ## Configuration
 
 Vous pouvez configurer l'integration de deux facons:
