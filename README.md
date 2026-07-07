@@ -2,6 +2,8 @@
 
 ![CrueVeille](custom_components/vigicrues_alert/brand/icon.png)
 
+**Description courte:** integration Home Assistant de surveillance Vigicrues/Hub'Eau pour anticiper les crues locales et declencher des alertes inondation selon une position, une station hydrometrique et des seuils configures.
+
 Integration personnalisee Home Assistant qui surveille une station hydrometrique Vigicrues/Hub'Eau proche d'une position et genere une alerte locale de risque d'inondation.
 
 Elle utilise l'API Hydrometrie Hub'Eau, dont les mesures temps reel proviennent de la plateforme HYDRO Centrale operee par le Service Central Vigicrues. Les hauteurs sont publiees en millimetres et les debits en litres par seconde par l'API; l'integration les convertit en metres et m3/s.

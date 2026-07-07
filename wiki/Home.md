@@ -2,6 +2,8 @@
 
 CrueVeille est une integration personnalisee Home Assistant pour surveiller une station hydrometrique Vigicrues/Hub'Eau proche d'une position et generer des alertes locales de risque d'inondation.
 
+Description courte: integration Home Assistant de surveillance Vigicrues/Hub'Eau pour anticiper les crues locales et declencher des alertes inondation selon une position, une station hydrometrique et des seuils configures.
+
 ## Pages
 
 - [Installation](Installation)
