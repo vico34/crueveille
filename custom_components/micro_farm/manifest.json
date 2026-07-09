@@ -1,0 +1,11 @@
+{
+  "domain": "micro_farm",
+  "name": "Micro Ferme",
+  "codeowners": [],
+  "config_flow": true,
+  "documentation": "https://github.com/vico34/micro-farm",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "requirements": [],
+  "version": "0.1.0"
+}
