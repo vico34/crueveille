@@ -138,6 +138,7 @@ def _schema(
     default_longitude: float,
     include_name: bool = True,
 ) -> vol.Schema:
+    number_input = vol.Any(str, int, float)
     fields: Dict[Any, Any] = {}
     latitude = defaults.get(CONF_LATITUDE, default_latitude)
     longitude = defaults.get(CONF_LONGITUDE, default_longitude)
@@ -158,39 +159,39 @@ def _schema(
             vol.Optional(
                 CONF_LATITUDE,
                 default=str(latitude),
-            ): str,
+            ): number_input,
             vol.Optional(
                 CONF_LONGITUDE,
                 default=str(longitude),
-            ): str,
+            ): number_input,
             vol.Optional(
                 CONF_RADIUS_KM,
                 default=str(defaults.get(CONF_RADIUS_KM, DEFAULT_RADIUS_KM)),
-            ): str,
+            ): number_input,
             vol.Optional(
                 CONF_WARNING_HEIGHT_M,
                 default=defaults.get(CONF_WARNING_HEIGHT_M, ""),
-            ): str,
+            ): number_input,
             vol.Optional(
                 CONF_CRITICAL_HEIGHT_M,
                 default=defaults.get(CONF_CRITICAL_HEIGHT_M, ""),
-            ): str,
+            ): number_input,
             vol.Optional(
                 CONF_WARNING_RISE_CM_H,
                 default=str(
                     defaults.get(CONF_WARNING_RISE_CM_H, DEFAULT_WARNING_RISE_CM_H)
                 ),
-            ): str,
+            ): number_input,
             vol.Optional(
                 CONF_CRITICAL_RISE_CM_H,
                 default=str(
                     defaults.get(CONF_CRITICAL_RISE_CM_H, DEFAULT_CRITICAL_RISE_CM_H)
                 ),
-            ): str,
+            ): number_input,
             vol.Optional(
                 CONF_FORECAST_HOURS,
                 default=str(defaults.get(CONF_FORECAST_HOURS, DEFAULT_FORECAST_HOURS)),
-            ): str,
+            ): number_input,
             vol.Optional(
                 CONF_ALERT_LEVEL,
                 default=defaults.get(CONF_ALERT_LEVEL, DEFAULT_ALERT_LEVEL),
@@ -250,7 +251,8 @@ def _float_value(
     maximum: Optional[float] = None,
 ) -> float:
     try:
-        number = float(value)
+        normalized = value.replace(",", ".") if isinstance(value, str) else value
+        number = float(normalized)
     except (TypeError, ValueError) as err:
         raise ValueError("invalid_number") from err
     if minimum is not None and number < minimum:
