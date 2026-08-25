@@ -1,4 +1,3 @@
-/home/vicar/.bashrc: line 43: bind: warning: line editing not enabled
 """Config flow for Vigicrues Alert."""
 
 from __future__ import annotations
